@@ -1,0 +1,19 @@
+[package]
+name = "doyoumarkdown"
+version = "0.0.1"
+edition = "2021"
+authors = ["Roland Rodriguez <rrrodzilla@protonmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "Validation and accessibility checks on markdown text"
+documentation = "https://docs.rs/doyoumarkdown/latest/doyoumarkdown/"
+repository = "https://github.com/rrrodzilla/doyoumarkdown"
+keywords = ["parser", "parsing", "nom", "markdown", "text"]
+categories = ["data-structures", "development-tools", "parser-implementations", "parsing", "text-processing"]
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.52"
+nom = "7.1.0"
+nom_locate = "4.0.0"
