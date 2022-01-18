@@ -17,47 +17,47 @@ const LEFT_MARKDOWN_IMAGE_BRACKET: &str = "![";
 
 pub type Span<'a> = LocatedSpan<&'a str>;
 
-fn left_parens(s: Span<'_>) -> IResult<Span<'_>, Span<'_>> {
+fn left_parens<'a>(s: Span<'a>) -> IResult<Span<'a>, Span<'a>> {
     tag(LEFT_PARENS)(s)
 }
 
-fn right_parens(s: Span<'_>) -> IResult<Span<'_>, Span<'_>> {
+fn right_parens<'a>(s: Span<'a>) -> IResult<Span<'a>, Span<'a>> {
     tag(RIGHT_PARENS)(s)
 }
 
-fn non_empty_parens(s: Span<'_>) -> IResult<Span<'_>, Span<'_>> {
+fn non_empty_parens<'a>(s: Span<'a>) -> IResult<Span<'a>, Span<'a>> {
     delimited(left_parens, is_not(RIGHT_PARENS), right_parens)(s)
 }
 
-fn empty_parens_pair(s: Span<'_>) -> IResult<Span<'_>, Span<'_>> {
+fn empty_parens_pair<'a>(s: Span<'a>) -> IResult<Span<'a>, Span<'a>> {
     terminated(left_parens, right_parens)(s)
 }
 
-fn right_bracket(s: Span<'_>) -> IResult<Span<'_>, Span<'_>> {
+fn right_bracket<'a>(s: Span<'a>) -> IResult<Span<'a>, Span<'a>> {
     tag(RIGHT_BRACKET)(s)
 }
 
-fn left_bracket(s: Span<'_>) -> IResult<Span<'_>, Span<'_>> {
+fn left_bracket<'a>(s: Span<'a>) -> IResult<Span<'a>, Span<'a>> {
     tag(LEFT_BRACKET)(s)
 }
 
-fn non_empty_brackets(s: Span<'_>) -> IResult<Span<'_>, Span<'_>> {
+fn non_empty_brackets<'a>(s: Span<'a>) -> IResult<Span<'a>, Span<'a>> {
     delimited(left_bracket, is_not(RIGHT_BRACKET), right_bracket)(s)
 }
 
-fn empty_brackets_pair(s: Span<'_>) -> IResult<Span<'_>, Span<'_>> {
+fn empty_brackets_pair<'a>(s: Span<'a>) -> IResult<Span<'a>, Span<'a>> {
     terminated(left_bracket, right_bracket)(s)
 }
 
-fn left_markdown_image_bracket(s: Span<'_>) -> IResult<Span<'_>, Span<'_>> {
+fn left_markdown_image_bracket<'a>(s: Span<'a>) -> IResult<Span<'a>, Span<'a>> {
     tag(LEFT_MARKDOWN_IMAGE_BRACKET)(s)
 }
 
-fn empty_markdown_image_bracket_pair(s: Span<'_>) -> IResult<Span<'_>, Span<'_>> {
+fn empty_markdown_image_bracket_pair<'a>(s: Span<'a>) -> IResult<Span<'a>, Span<'a>> {
     terminated(left_markdown_image_bracket, right_bracket)(s)
 }
 
-fn non_empty_markdown_image_bracket_pair(s: Span<'_>) -> IResult<Span<'_>, Span<'_>> {
+fn non_empty_markdown_image_bracket_pair<'a>(s: Span<'a>) -> IResult<Span<'a>, Span<'a>> {
     delimited(
         left_markdown_image_bracket,
         is_not(RIGHT_BRACKET),
@@ -65,30 +65,30 @@ fn non_empty_markdown_image_bracket_pair(s: Span<'_>) -> IResult<Span<'_>, Span<
     )(s)
 }
 
-fn markdown_image_brackets(s: Span<'_>) -> IResult<Span<'_>, Span<'_>> {
+fn markdown_image_brackets<'a>(s: Span<'a>) -> IResult<Span<'a>, Span<'a>> {
     alt((
         empty_markdown_image_bracket_pair,
         non_empty_markdown_image_bracket_pair,
     ))(s)
 }
 
-fn brackets(s: Span<'_>) -> IResult<Span<'_>, Span<'_>> {
+fn brackets<'a>(s: Span<'a>) -> IResult<Span<'a>, Span<'a>> {
     alt((empty_brackets_pair, non_empty_brackets))(s)
 }
 
-fn parens(s: Span<'_>) -> IResult<Span<'_>, Span<'_>> {
+fn parens<'a>(s: Span<'a>) -> IResult<Span<'a>, Span<'a>> {
     alt((empty_parens_pair, non_empty_parens))(s)
 }
 
-fn markdown_url(s: Span<'_>) -> IResult<Span<'_>, (Span<'_>, Span<'_>)> {
+fn markdown_url<'a>(s: Span<'a>) -> IResult<Span<'a>, (Span<'a>, Span<'a>)> {
     tuple((brackets, parens))(s)
 }
 
-fn markdown_image(s: Span<'_>) -> IResult<Span<'_>, (Span<'_>, Span<'_>)> {
+fn markdown_image<'a>(s: Span<'a>) -> IResult<Span<'a>, (Span<'a>, Span<'a>)> {
     tuple((markdown_image_brackets, parens))(s)
 }
 
-pub fn all_markdown_images(s: Span<'_>) -> IResult<Span<'_>, Vec<MarkdownUrl<'_>>> {
+pub fn all_markdown_images<'a>(s: Span<'a>) -> IResult<Span<'a>, Vec<MarkdownUrl<'a>>> {
     fold_many0(
         pair(take_until(LEFT_MARKDOWN_IMAGE_BRACKET), markdown_image),
         Vec::new,
@@ -108,7 +108,7 @@ pub fn all_markdown_images(s: Span<'_>) -> IResult<Span<'_>, Vec<MarkdownUrl<'_>
     )(s)
 }
 
-pub fn all_markdown_urls(s: Span<'_>) -> IResult<Span<'_>, Vec<MarkdownUrl<'_>>> {
+pub fn all_markdown_urls<'a>(s: Span<'a>) -> IResult<Span<'a>, Vec<MarkdownUrl<'a>>> {
     fold_many0(
         pair(take_until(LEFT_BRACKET), markdown_url),
         Vec::new,
@@ -135,7 +135,9 @@ pub fn all_markdown_urls(s: Span<'_>) -> IResult<Span<'_>, Vec<MarkdownUrl<'_>>>
     )(s)
 }
 
-pub fn all_empty_alt_text_markdown_images(s: Span<'_>) -> IResult<Span<'_>, Vec<MarkdownUrl<'_>>> {
+pub fn all_empty_alt_text_markdown_images<'a>(
+    s: Span<'a>,
+) -> IResult<Span<'a>, Vec<MarkdownUrl<'a>>> {
     fold_many0(
         pair(take_until(EMPTY_IMAGE_BRACKETS), markdown_image),
         Vec::new,
@@ -156,7 +158,7 @@ pub fn all_empty_alt_text_markdown_images(s: Span<'_>) -> IResult<Span<'_>, Vec<
     )(s)
 }
 
-pub fn all_empty_href_markdown_urls(s: Span<'_>) -> IResult<Span<'_>, Vec<MarkdownUrl<'_>>> {
+pub fn all_empty_href_markdown_urls<'a>(s: Span<'a>) -> IResult<Span<'a>, Vec<MarkdownUrl<'a>>> {
     fold_many0(
         pair(take_until(LEFT_BRACKET), markdown_url),
         Vec::new,
@@ -181,7 +183,7 @@ pub fn all_empty_href_markdown_urls(s: Span<'_>) -> IResult<Span<'_>, Vec<Markdo
     )(s)
 }
 
-pub fn all_empty_href_markdown_images(s: Span<'_>) -> IResult<Span<'_>, Vec<MarkdownUrl<'_>>> {
+pub fn all_empty_href_markdown_images<'a>(s: Span<'a>) -> IResult<Span<'a>, Vec<MarkdownUrl<'a>>> {
     fold_many0(
         pair(take_until(LEFT_MARKDOWN_IMAGE_BRACKET), markdown_image),
         Vec::new,
@@ -203,7 +205,9 @@ pub fn all_empty_href_markdown_images(s: Span<'_>) -> IResult<Span<'_>, Vec<Mark
     )(s)
 }
 
-pub fn all_empty_anchor_text_markdown_urls(s: Span<'_>) -> IResult<Span<'_>, Vec<MarkdownUrl<'_>>> {
+pub fn all_empty_anchor_text_markdown_urls<'a>(
+    s: Span<'a>,
+) -> IResult<Span<'a>, Vec<MarkdownUrl<'a>>> {
     fold_many0(
         pair(take_until(EMPTY_BRACKETS), markdown_url),
         Vec::new,
@@ -226,7 +230,9 @@ pub fn all_empty_anchor_text_markdown_urls(s: Span<'_>) -> IResult<Span<'_>, Vec
     )(s)
 }
 
-pub fn all_low_alt_text_markdown_images(s: Span<'_>) -> IResult<Span<'_>, Vec<MarkdownUrl<'_>>> {
+pub fn all_low_alt_text_markdown_images<'a>(
+    s: Span<'a>,
+) -> IResult<Span<'a>, Vec<MarkdownUrl<'a>>> {
     fold_many0(
         pair(take_until(LEFT_MARKDOWN_IMAGE_BRACKET), markdown_image),
         Vec::new,
